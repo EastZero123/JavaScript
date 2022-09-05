@@ -1,31 +1,71 @@
-const movieList = document.getElementById('movie-list');
+const addMovieBtn = document.getElementById("add-movie-btn");
+const searchBtn = document.getElementById("search-btn");
 
-movieList.style['background-color'] = 'red';
-movieList.style.display = 'block';
+const movies = [];
 
-const userChosenKeyName = 'level';
+const renderMovies = (filter = "") => {
+  const movieList = document.getElementById("movie-list");
 
-let person = {
-  'first name': 'Max',
-  age: 30,
-  hobbies: ['Sports', 'Cooking'],
-  [userChosenKeyName]: '...',
-  greet: function() {
-    alert('Hi there!');
-  },
-  1.5: 'hello'
+  if (movieList.length === 0) {
+    movieList.classList.remove("visible");
+    return;
+  } else {
+    movieList.classList.add("visible");
+  }
+
+  movieList.innerHTML = "";
+
+  const filteredMovies = !filter
+    ? movies
+    : movies.filter((movie) => {
+        return movie.info.title.includes(filter);
+      });
+
+  filteredMovies.forEach((movie) => {
+    const movieEl = document.createElement("li");
+    const { info, ...otherProps } = movie;
+    // movieEl.textContent = movie.info.title + "-" + movie.info[extraName];
+    const { title: movieTitle } = info;
+    let text = movieTitle + " - ";
+    for (const key in info) {
+      if (key !== "title") {
+        text = text + `${key}: ${info[key]}`;
+      }
+    }
+    movieEl.textContent = text;
+    movieList.append(movieEl);
+  });
 };
 
-// ...
+const addMovieHandler = () => {
+  const title = document.getElementById("title").value;
+  const extraName = document.getElementById("extra-name").value;
+  const extraValue = document.getElementById("extra-value").value;
 
-// person.age = 31;
-delete person.age;
-// person.age = undefined;
-// person.age = null;
-person.isAdmin = true;
+  if (
+    title.trim() === "" ||
+    extraName.trim() === "" ||
+    extraValue.trim() === ""
+  ) {
+    return;
+  }
 
-const keyName = 'first name';
+  const newMovie = {
+    info: {
+      title,
+      [extraName]: extraValue,
+    },
+    id: Math.random().toString(),
+  };
 
-console.log(person[keyName]);
-console.log(person[1.5]);
-console.log(person);
+  movies.push(newMovie);
+  renderMovies();
+};
+
+const searchMovieHandler = () => {
+  const filterTerm = document.getElementById("filter-title").value;
+  renderMovies(filterTerm);
+};
+
+addMovieBtn.addEventListener("click", addMovieHandler);
+searchBtn.addEventListener("click", searchMovieHandler);
